@@ -1,0 +1,4 @@
+include:
+  - local: '/job_templates/build.yml'
+  - local: '/job_templates/code_scan.yml'
+  - local: '/job_templates/publish.yml'
