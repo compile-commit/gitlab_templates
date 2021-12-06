@@ -6,9 +6,9 @@ stages:
 include:
   - local: '/pipeline_templates/import.yml'
   
-compile_commit:
+build:
   stage: build
-  extends: .compile_commit
+  extends: .build
   
 code_scan:
   stage: codescan
