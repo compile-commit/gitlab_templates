@@ -1,0 +1,122 @@
+.compile_commit:
+  variables:
+    PACKAGE_TYPE: 'zip'
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
+  artifacts:
+    paths:
+      - target/*.$PACKAGE_TYPE
+      - .m2/repository
+    expire_in: 3 hours
+    
+.compile_commit_variable:
+  variables:
+    PACKAGE_TYPE: 'zip'
+  only:
+    - branches
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - mvn -f $POM $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
+  artifacts:
+    paths:
+      - $TARGET/*.$PACKAGE_TYPE
+      - .m2/repository
+    expire_in: 3 hours
+    
+.compile_commit_assembly:
+  variables:
+    PACKAGE_TYPE: 'zip'
+  only:
+    - branches
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS assembly:single
+  artifacts:
+    paths:
+      - target/*.$PACKAGE_TYPE
+      - .m2/repository
+    expire_in: 3 hours
+    
+.compile_commit_jdk11:
+  variables:
+    MAVEN_VERSION: '3.6.3-jdk-11'
+    PACKAGE_TYPE: 'zip'
+  only:
+    - branches
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
+  script:
+    - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
+  artifacts:
+    paths:
+      - target/*.$PACKAGE_TYPE
+      - .m2/repository
+    expire_in: 3 hours
+    
+.merge_commit:
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
+  artifacts:
+    paths:
+      - .m2/repository
+    expire_in: 3 hours
+    
+.install_dependency:
+  variables:
+    POM: ''
+  only:
+    - branches
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - mvn -f $POM $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
+  artifacts:
+    paths:
+      - .m2/repository
+    expire_in: 3 hours
+    
+.compile_commit_script:
+  variables:
+    PACKAGE_TYPE: 'zip'
+  script:
+    - sh build.sh
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  artifacts:
+    paths:
+    - $TARGET/*.$PACKAGE_TYPE
+    - .m2/repository
+    expire_in: 3 hours
+    
+.compile_commit_script_jdk11:
+  variables:
+    PACKAGE_TYPE: 'zip'
+  variables:
+    MAVEN_VERSION: '3.6.3-jdk-11'
+  script:
+    - sh build.sh
+  tags:
+    - ac-billing
+  image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
+  artifacts:
+    paths:
+    - $TARGET/*.$PACKAGE_TYPE
+    - .m2/repository
+    expire_in: 3 hours
