@@ -1,0 +1,124 @@
+.code_scan:
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - export VERSION=$(cat pom.xml | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f pom.xml package sonar:sonar -Dsonar.login="$SONARQUBE_TOKEN" -Dsonar.host.url="$SONARQUBE_BASE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectVersion="$VERSION"
+    - sed -i 's/\r$//' .devops/sonarqube_build_breaker.sh
+    - bash .devops/sonarqube_build_breaker.sh "$SONARQUBE_BASE_URL" "$SONARQUBE_TOKEN" "$GROUP_NAME":"$CI_PROJECT_NAME"
+    
+.code_scan_variable:
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - export VERSION=$(cat $POM | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f $POM package sonar:sonar -Dsonar.login="$SONARQUBE_TOKEN" -Dsonar.host.url="$SONARQUBE_BASE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectVersion="$VERSION"
+    - sed -i 's/\r$//' .devops/sonarqube_build_breaker.sh
+    - bash .devops/sonarqube_build_breaker.sh "$SONARQUBE_BASE_URL" "$SONARQUBE_TOKEN" "$GROUP_NAME":"$CI_PROJECT_NAME"
+    
+.code_scan_cli:
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image:
+    name: $IMAGE_PREFIX/sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  script:
+    - sonar-scanner -Dsonar.host.url="$SONARQUBE_BASE_URL" 
+      -Dsonar.login="$SONARQUBE_TOKEN" 
+      -Dsonar.projectKey="$GROUP_NAME:$CI_PROJECT_NAME" 
+      -Dsonar.sources=.
+      -Dsonar.projectVersion="$CI_COMMIT_REF_NAME"-"$TIMESTAMP"
+    - sed -i 's/\r$//' .devops/sonarqube_build_breaker.sh
+    - bash .devops/sonarqube_build_breaker.sh "$SONARQUBE_BASE_URL" "$SONARQUBE_TOKEN" "$GROUP_NAME":"$CI_PROJECT_NAME"
+    
+.code_scan_jdk11:
+  variables:
+    MAVEN_VERSION: '3.6.3-jdk-11'
+    SONARQUBE_URL: $SONARQUBE_89_URL
+    SONARQUBE_AUTH: $SONARQUBE_89_TOKEN
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
+  script:
+    - export VERSION=$(cat pom.xml | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f pom.xml package sonar:sonar -Dsonar.login="$SONARQUBE_AUTH" -Dsonar.host.url="$SONARQUBE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectVersion="$VERSION"
+    - sed -i 's/\r$//' .devops/sonarqube_build_breaker.sh
+    - bash .devops/sonarqube_build_breaker.sh "$SONARQUBE_URL" "$SONARQUBE_AUTH" "$GROUP_NAME":"$CI_PROJECT_NAME"
+    
+.code_scan_variable_jdk11:
+  variables:
+    MAVEN_VERSION: '3.6.3-jdk-11'
+    SONARQUBE_URL: $SONARQUBE_89_URL
+    SONARQUBE_AUTH: $SONARQUBE_89_TOKEN
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
+  script:
+    - export VERSION=$(cat $POM | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f $POM package sonar:sonar -Dsonar.login="$SONARQUBE_AUTH" -Dsonar.host.url="$SONARQUBE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME" -Dsonar.projectVersion="$VERSION"
+    - sed -i 's/\r$//' .devops/sonarqube_build_breaker.sh
+    - bash .devops/sonarqube_build_breaker.sh "$SONARQUBE_URL" "$SONARQUBE_AUTH" "$GROUP_NAME":"$CI_PROJECT_NAME"
+    
+.code_scan_security:
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - export VERSION=$(cat pom.xml | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f pom.xml package sonar:sonar -Dsonar.login="$SONARQUBE_TOKEN" -Dsonar.host.url="$SONARQUBE_BASE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectVersion="$VERSION"
+  allow_failure: true
+  
+.code_scan_security_variable:
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_TAG
+  script:
+    - export VERSION=$(cat $POM | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f $POM package sonar:sonar -Dsonar.login="$SONARQUBE_TOKEN" -Dsonar.host.url="$SONARQUBE_BASE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectVersion="$VERSION"
+  allow_failure: true
+  
+.code_scan_security_jdk11:
+  variables:
+    MAVEN_VERSION: '3.6.3-jdk-11'
+    SONARQUBE_URL: $SONARQUBE_89_URL
+    SONARQUBE_AUTH: $SONARQUBE_89_TOKEN
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
+  script:
+    - export VERSION=$(cat pom.xml | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f pom.xml package sonar:sonar -Dsonar.login="$SONARQUBE_AUTH" -Dsonar.host.url="$SONARQUBE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectVersion="$VERSION"
+  allow_failure: true
+  
+.code_scan_security_variable_jdk11:
+  variables:
+    MAVEN_VERSION: '3.6.3-jdk-11'
+    SONARQUBE_URL: $SONARQUBE_89_URL
+    SONARQUBE_AUTH: $SONARQUBE_89_TOKEN
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
+  script:
+    - export VERSION=$(cat $POM | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - mvn -f $POM package sonar:sonar -Dsonar.login="$SONARQUBE_AUTH" -Dsonar.host.url="$SONARQUBE_URL" -Dsonar.projectKey="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectName="$GROUP_NAME":"$CI_PROJECT_NAME"-security -Dsonar.projectVersion="$VERSION"
+  allow_failure: true
