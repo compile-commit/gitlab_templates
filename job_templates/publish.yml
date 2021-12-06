@@ -1,0 +1,14 @@
+.publish:
+  variables:
+    PACKAGE_TYPE: 'zip'
+  only:
+    - branches
+  tags:
+    - $RUNNER_TAG
+  image: $IMAGE_PREFIX/meisterplan/jfrog-cli
+  script:
+    - export VERSION=$(cat pom.xml | grep "<version>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - export ARTIFACT_ID=$(cat pom.xml | grep "<artifactId>" | head -1 | cut -d">" -f2 | cut -d"<" -f1 | awk '{$1=$1;print}')
+    - export DIRECTORY=$(date +%Y%m%d)
+    - jfrog rt c --url="$ARTIFACTORY_URL" --apikey="$ARTIFACTORY_KEY"
+    - jfrog rt u "target/*.$PACKAGE_TYPE" $REPO_NAME/$GROUP_NAME/$CI_PROJECT_NAME/$DIRECTORY/$CI_COMMIT_REF_NAME/$CI_PIPELINE_ID/$ARTIFACT_ID-"$VERSION".$PACKAGE_TYPE --recursive=false 
