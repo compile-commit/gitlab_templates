@@ -1,0 +1,24 @@
+stages:
+  - build
+  - codescan
+  - artifactpublish
+
+include:
+  - local: '/pipeline_templates/import.yml'
+  
+compile_commit:
+  stage: build
+  extends: .compile_commit
+  
+code_scan:
+  stage: codescan
+  extends: .code_scan
+  
+publish:
+  stage: artifactpublish
+  variables:
+    PACKAGE_TYPE: 'zip'
+  needs:
+    - job: compile_commit
+      artifacts: true
+  extends: .publish
