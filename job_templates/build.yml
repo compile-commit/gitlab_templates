@@ -1,4 +1,4 @@
-.compile_commit:
+.build:
   variables:
     PACKAGE_TYPE: 'zip'
   only:
@@ -14,7 +14,7 @@
       - .m2/repository
     expire_in: 3 hours
     
-.compile_commit_variable:
+.build_variable:
   variables:
     PACKAGE_TYPE: 'zip'
   only:
@@ -30,7 +30,7 @@
       - .m2/repository
     expire_in: 3 hours
     
-.compile_commit_assembly:
+.build_assembly:
   variables:
     PACKAGE_TYPE: 'zip'
   only:
@@ -46,7 +46,7 @@
       - .m2/repository
     expire_in: 3 hours
     
-.compile_commit_jdk11:
+.build_jdk11:
   variables:
     MAVEN_VERSION: '3.6.3-jdk-11'
     PACKAGE_TYPE: 'zip'
@@ -91,7 +91,7 @@
       - .m2/repository
     expire_in: 3 hours
     
-.compile_commit_script:
+.build_script:
   variables:
     PACKAGE_TYPE: 'zip'
   script:
@@ -105,7 +105,7 @@
     - .m2/repository
     expire_in: 3 hours
     
-.compile_commit_script_jdk11:
+.build_script_jdk11:
   variables:
     PACKAGE_TYPE: 'zip'
   variables:
