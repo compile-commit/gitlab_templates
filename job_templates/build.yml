@@ -20,7 +20,7 @@
   only:
     - branches
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_TAG
   script:
     - mvn -f $POM $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
@@ -36,7 +36,7 @@
   only:
     - branches
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_TAG
   script:
     - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS assembly:single
@@ -53,7 +53,7 @@
   only:
     - branches
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
   script:
     - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
@@ -67,7 +67,7 @@
   rules:
     - if: $CI_MERGE_REQUEST_ID
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_TAG
   script:
     - mvn -f pom.xml $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
@@ -82,7 +82,7 @@
   only:
     - branches
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_TAG
   script:
     - mvn -f $POM $MAVEN_CLI_OPTS clean install $MAVEN_OPTS
@@ -97,7 +97,7 @@
   script:
     - sh build.sh
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_TAG
   artifacts:
     paths:
@@ -113,7 +113,7 @@
   script:
     - sh build.sh
   tags:
-    - ac-billing
+    - $RUNNER_TAG
   image: $IMAGE_PREFIX/maven:$MAVEN_VERSION
   artifacts:
     paths:
